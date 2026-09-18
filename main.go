@@ -67,7 +67,13 @@ func calculateTotal(w http.ResponseWriter, req *http.Request) {
 }
 
 func calculateTxs(txs []BankTx) (income, expenses int) {
+	seen := make(map[string]struct{}, len(txs))
 	for _, tx := range txs {
+		if _, dup := seen[tx.TransactionID]; dup {
+			continue
+		}
+		seen[tx.TransactionID] = struct{}{}
+
 		switch tx.TransactionType {
 		case "credit", "income", "incoming transfer":
 			income += tx.Amount
